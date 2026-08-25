@@ -22,7 +22,7 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
       border-radius: 24px;
       padding: 35px 30px;
@@ -50,8 +50,8 @@
 
     h1 {
       color: #2d3436;
-      font-size: 1.6rem;
-      margin-bottom: 24px;
+      font-size: 1.55rem;
+      margin-bottom: 22px;
       line-height: 1.3;
     }
 
@@ -59,6 +59,11 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+
+    .btn-group-step1 {
+      position: relative;
+      min-height: 130px;
     }
 
     .btn {
@@ -70,7 +75,7 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
       box-shadow: 0 4px 10px rgba(255, 118, 117, 0.1);
     }
 
@@ -79,6 +84,11 @@
       color: #ffffff;
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(255, 118, 117, 0.25);
+    }
+
+    #noBtn {
+      position: relative;
+      user-select: none;
     }
 
     input[type="date"] {
@@ -111,6 +121,10 @@
       color: #636e72;
     }
 
+    .summary-item:last-child {
+      margin-bottom: 0;
+    }
+
     .summary-item strong {
       color: #2d3436;
     }
@@ -141,9 +155,11 @@
     <!-- Step 1: The Question -->
     <div class="step active" id="step1">
       <h1>May I take you out on a date? ✨</h1>
-      <div class="btn-group">
-        <button class="btn" onclick="handleChoice('isDate', 'Yes', 2)">Yes 🥰</button>
-        <button class="btn" onclick="handleChoice('isDate', 'No', 2)">No (Just hanging out) 😊</button>
+      <div class="btn-group btn-group-step1">
+        <button class="btn" id="yesBtn" onclick="handleChoice('isDate', 'Yes', 2)">Yes 🥰</button>
+        <button class="btn" id="noBtn" onmouseover="dodgeNo()" onclick="handleChoice('isDate', 'No', 2)">
+          No (Just hanging out) 😊
+        </button>
       </div>
     </div>
 
@@ -165,24 +181,46 @@
       </div>
     </div>
 
-    <!-- Step 4: Pick-up Time -->
+    <!-- Step 4: Activity -->
     <div class="step" id="step4">
-      <h1>What time should I pick you up? 🚗</h1>
+      <h1>Anything you want to do? 🎯</h1>
       <div class="btn-group">
-        <button class="btn" onclick="handleChoice('time', '11:00 AM', 5)">11:00 am</button>
-        <button class="btn" onclick="handleChoice('time', '12:00 PM', 5)">12:00 pm</button>
-        <button class="btn" onclick="handleChoice('time', '1:00 PM', 5)">1:00 pm</button>
+        <button class="btn" onclick="handleChoice('activity', 'Arcade 🕹️', 5)">Arcade 🕹️</button>
+        <button class="btn" onclick="handleChoice('activity', 'Chill 🍃', 5)">Chill 🍃</button>
+        <button class="btn" onclick="handleChoice('activity', 'Movies 🎬', 5)">Movies 🎬</button>
+        <button class="btn" onclick="handleChoice('activity', 'Museum 🏛️', 5)">Museum 🏛️</button>
       </div>
     </div>
 
-    <!-- Step 5: Summary -->
+    <!-- Step 5: Drink Preference -->
     <div class="step" id="step5">
+      <h1>Coffee or Matcha? ☕🍵</h1>
+      <div class="btn-group">
+        <button class="btn" onclick="handleChoice('drink', 'Coffee ☕', 6)">Coffee ☕</button>
+        <button class="btn" onclick="handleChoice('drink', 'Matcha 🍵', 6)">Matcha 🍵</button>
+      </div>
+    </div>
+
+    <!-- Step 6: Pick-up Time -->
+    <div class="step" id="step6">
+      <h1>What time should I pick you up? 🚗</h1>
+      <div class="btn-group">
+        <button class="btn" onclick="handleChoice('time', '11:00 AM', 7)">11:00 am</button>
+        <button class="btn" onclick="handleChoice('time', '12:00 PM', 7)">12:00 pm</button>
+        <button class="btn" onclick="handleChoice('time', '1:00 PM', 7)">1:00 pm</button>
+      </div>
+    </div>
+
+    <!-- Step 7: Summary -->
+    <div class="step" id="step7">
       <div id="finalBadge"></div>
       <h1 id="finalTitle">Summary</h1>
 
       <div class="summary-card">
         <div class="summary-item"><strong>Date:</strong> <span id="sumDate"></span></div>
         <div class="summary-item"><strong>Food:</strong> <span id="sumFood"></span></div>
+        <div class="summary-item"><strong>Activity:</strong> <span id="sumActivity"></span></div>
+        <div class="summary-item"><strong>Drink:</strong> <span id="sumDrink"></span></div>
         <div class="summary-item"><strong>Pick-up Time:</strong> <span id="sumTime"></span></div>
       </div>
 
@@ -198,8 +236,50 @@
       isDate: "",
       date: "",
       food: "",
+      activity: "",
+      drink: "",
       time: ""
     };
+
+    let dodgeCount = 0;
+
+    function dodgeNo() {
+      const noBtn = document.getElementById('noBtn');
+      const yesBtn = document.getElementById('yesBtn');
+      
+      dodgeCount++;
+
+      const randomX = (Math.random() - 0.5) * 180;
+      const randomY = (Math.random() - 0.5) * 70;
+
+      const newScale = Math.max(0.6, 1 - dodgeCount * 0.08);
+      const yesScale = Math.min(1.25, 1 + dodgeCount * 0.05);
+
+      noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${newScale})`;
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      const playfulPhrases = [
+        "Are you sure? 🥺",
+        "Think again! 😉",
+        "Missed me! 🏃‍♂️",
+        "Almost! ✨",
+        "Just say yes 🥰"
+      ];
+
+      if (dodgeCount <= playfulPhrases.length) {
+        noBtn.innerText = playfulPhrases[dodgeCount - 1];
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const noBtn = document.getElementById('noBtn');
+      if (noBtn) {
+        noBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          dodgeNo();
+        });
+      }
+    });
 
     function showStep(stepNumber) {
       document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
@@ -208,7 +288,7 @@
 
     function handleChoice(field, value, nextStep) {
       responses[field] = value;
-      if (nextStep === 5) {
+      if (nextStep === 7) {
         finishAndSend();
       } else {
         showStep(nextStep);
@@ -226,7 +306,7 @@
     }
 
     function finishAndSend() {
-      showStep(5);
+      showStep(7);
 
       const isDate = responses.isDate === 'Yes';
       const badgeContainer = document.getElementById('finalBadge');
@@ -242,9 +322,10 @@
 
       document.getElementById('sumDate').innerText = responses.date;
       document.getElementById('sumFood').innerText = responses.food;
+      document.getElementById('sumActivity').innerText = responses.activity;
+      document.getElementById('sumDrink').innerText = responses.drink;
       document.getElementById('sumTime').innerText = responses.time;
 
-      // Submit results to your email via Formspree
       fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -254,7 +335,7 @@
         document.getElementById('sendingText').innerText = "All set! See you then. ✨";
       })
       .catch(error => {
-        document.getElementById('sendingText').innerText = "Saved locally! Take a screenshot and send it to me! 📸";
+        document.getElementById('sendingText').innerText = "Saved! Take a screenshot and send it to me! 📸";
       });
     }
   </script>
